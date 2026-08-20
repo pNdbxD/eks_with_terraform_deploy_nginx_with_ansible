@@ -1,0 +1,31 @@
+---
+- name: Deploy Docker Application to Kubernetes
+  hosts: localhost  # Use localhost to run the playbook from your local machine
+  vars:
+#    ansible_python_interpreter: /usr/bin/python3
+#    ansible_python_interpreter: /opt/homebrew/bin/python3.14
+    ansible_python_interpreter: "/Users/edgar/Library/Caches/pypoetry/virtualenvs/15-ansible-deploy-k8s-tf-rEDvM0kn-py3.14/bin/python"
+    kubeconfig: "/Users/edgar/projects/devops_badge/eks_with_terraform_deploy_nginx_with_ansible/ansible/kubeconfig_ans_x_eks_cluster"
+
+
+  tasks:
+    - name: Test debug message
+      ansible.builtin.debug:
+        msg: "Hi!"
+
+    - name: Create Kubernetes Namespace
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: k8s-namespace
+
+    - name: Deploy nginx app to Kubernetes
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        src: ./nginx-config.yaml
+        namespace: k8s-namespace
